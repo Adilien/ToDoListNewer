@@ -1,0 +1,33 @@
+﻿@page "/create-task"
+@inject NavigationManager NavigationManager
+@inject HttpClient httpClient
+@using ToDoList.Shared
+
+<PageTitle>Create Task</PageTitle>
+
+<h1>Create Task</h1>
+
+<p>Enter details of your new Task below:</p>
+
+<EditForm Model="taskToCreate" OnSubmit="CreateUserTask">
+    <div>
+        <label for="usertasktext">Task</label>
+        <InputText id="usertasktext" @bind-Value="@taskToCreate.Text" class="form-control"></InputText>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">Create Task</button>
+</EditForm>
+
+@code {
+    public List<UserTask> UserTasks { get; set; } = new List<UserTask>();
+    UserTask taskToCreate = new UserTask();
+
+    public async Task CreateUserTask()
+    {
+        var result = await httpClient.PostAsJsonAsync("api/todolist/create", taskToCreate);
+        var response = await result.Content.ReadFromJsonAsync<List<UserTask>>();
+
+        UserTasks = response;
+        NavigationManager.NavigateTo("/");
+    }
+}

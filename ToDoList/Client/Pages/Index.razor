@@ -1,0 +1,75 @@
+﻿@page "/"
+@using ToDoList.Shared
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome to my To-Do List app!</h1>
+<p>
+    A To-Do List Blazor CRUD app built using C# and .NET 6 along with Entity Framework Core and SQL Server Express. 
+    Users can create, read, update and delete their own tasks.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="to-do-list-table">
+                Tasks
+                <button class="btn btn-primary" @onclick="(() => CreateUserTask())"><i class="oi oi-plus"></i> Create New Task</button>
+            </th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var userTask in UserTasks)
+        {
+            <tr>
+                <td>
+                    <div style="float:left;">
+                        @userTask.Text
+                    </div>
+                    <div style="float:right;">
+                        <button class="btn btn-primary" @onclick="(() => EditUserTask(userTask.Id))"><i class="oi oi-pencil"></i></button>
+                        <button class="btn btn-primary" @onclick="(() => DeleteUserTask(userTask.Id))"><i class="oi oi-minus"></i></button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public List<UserTask> UserTasks { get; set; } = new List<UserTask>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            UserTasks = await httpClient.GetFromJsonAsync<List<UserTask>>("api/todolist");
+        }
+        catch
+        {
+            UserTasks = new List<UserTask>();
+        }
+        StateHasChanged();
+    }
+
+    public void CreateUserTask()
+    {
+        NavigationManager.NavigateTo("/create-task");
+    }
+
+    public async Task DeleteUserTask(int id)
+    {
+        var result = await httpClient.DeleteAsync($"api/todolist/delete/{id}");
+        var response = await result.Content.ReadFromJsonAsync<List<UserTask>>();
+
+        UserTasks = response;
+    }
+
+    public void EditUserTask(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-task/{id}");
+    }
+}

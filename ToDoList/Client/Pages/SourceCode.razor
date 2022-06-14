@@ -1,0 +1,17 @@
+﻿@page "/source-code"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Source Code</PageTitle>
+
+<h1>Source Code</h1>
+
+<p>Click the button below to explore the respository for this project!</p>
+
+<button class="btn btn-primary" @onclick="NavigateToSourceCode"><i class="bi bi-git"></i>  Click me to go to GitHub!</button>
+
+@code {
+    private void NavigateToSourceCode()
+    {
+        NavigationManager.NavigateTo("https://github.com/Adilien/to-do-list");
+    }
+}

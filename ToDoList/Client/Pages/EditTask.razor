@@ -1,0 +1,41 @@
+﻿@page "/edit-task/{id:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient httpClient
+@using ToDoList.Shared
+
+<PageTitle>Edit Task</PageTitle>
+
+<h1>Edit Task</h1>
+
+<p>Edit details of your Task below:</p>
+
+<EditForm Model="taskToEdit" OnSubmit="EditUserTask">
+    <div>
+        <label for="usertasktext">Task</label>
+        <InputText id="usertasktext" @bind-Value="@taskToEdit.Text" class="form-control"></InputText>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">Update Task</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public List<UserTask> UserTasks { get; set; } = new List<UserTask>();
+    UserTask taskToEdit = new UserTask();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        taskToEdit = await httpClient.GetFromJsonAsync<UserTask>($"api/todolist/{Id}");
+    }
+
+    public async Task EditUserTask()
+    {
+        var result = await httpClient.PutAsJsonAsync($"api/todolist/update/{Id}", taskToEdit);
+        var response = await result.Content.ReadFromJsonAsync<List<UserTask>>();
+
+        UserTasks = response;
+        NavigationManager.NavigateTo("/");
+    }
+}
