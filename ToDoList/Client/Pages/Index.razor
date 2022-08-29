@@ -22,6 +22,14 @@
         </tr>
     </thead>
     <tbody>
+        @if (@isLoading)
+        {
+            <tr>
+                <td>
+                    <div>Loading Tasks...</div>
+                </td>
+            </tr>
+        }
         @foreach (var userTask in UserTasks)
         {
             <tr>
@@ -41,12 +49,15 @@
 
 @code {
     public List<UserTask> UserTasks { get; set; } = new List<UserTask>();
+    public bool isLoading;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            isLoading = true;
             UserTasks = await httpClient.GetFromJsonAsync<List<UserTask>>("api/todolist");
+            isLoading = false;
         }
         catch
         {
